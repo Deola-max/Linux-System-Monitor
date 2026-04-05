@@ -1,0 +1,23 @@
+# --- CONFIGURATION ---
+BACKUP_DATE=$(date +%Y-%m-%d_%H-%M)
+CONTAINER_NAME="favour-cloud-app"  # Your real Nextcloud container!
+BACKUP_DIR="$HOME/Git-Backup-System/vault"
+REPO_DIR="$HOME/Git-Backup-System"
+
+mkdir -p $BACKUP_DIR
+
+echo "🛡️ Starting High-Availability Backup for $CONTAINER_NAME..."
+
+# 1. THE EXTRACT: Pull the live Nextcloud data
+# Note: Nextcloud stores its main data in /var/www/html
+docker cp $CONTAINER_NAME:/var/www/html $BACKUP_DIR/cloud_snapshot_$BACKUP_DATE
+
+# 2. THE COMPRESS: 
+tar -czf $BACKUP_DIR/cloud_backup_$BACKUP_DATE.tar.gz -C $BACKUP_DIR cloud_snapshot_$BACKUP_DATE
+rm -rf $BACKUP_DIR/cloud_snapshot_$BACKUP_DATE
+
+# 3. THE GIT AUTOMATION
+cd $REPO_DIR
+git add .
+git commit -m "📦 CLOUD-BACKUP: Snapshot $BACKUP_DATE [Nextcloud Persistent Data]"
+git push origin main

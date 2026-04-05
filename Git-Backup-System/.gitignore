@@ -1,0 +1,2 @@
+# Ignore raw snapshots, only keep the zips
+vault/*_snapshot_*/
